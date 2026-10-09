@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CategoryDTO {
     private Long id;
+    @jakarta.validation.constraints.NotBlank(message = "Category name is required")
+    @jakarta.validation.constraints.Size(max = 120)
     private String name;
     private String slug;
     private String description;

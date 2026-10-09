@@ -1,8 +1,10 @@
 package com.ngo.impact.service;
 
 import com.ngo.impact.dto.AuthResponse;
+import com.ngo.impact.dto.ChangePasswordRequest;
 import com.ngo.impact.dto.LoginRequest;
 import com.ngo.impact.dto.RegisterRequest;
+import com.ngo.impact.dto.UpdateProfileRequest;
 import com.ngo.impact.dto.UserDTO;
 import com.ngo.impact.entity.Cart;
 import com.ngo.impact.entity.User;
@@ -15,12 +17,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -34,14 +36,15 @@ public class AuthService {
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
+        String email = normalizeEmail(request.getEmail());
+        if (userRepository.existsByEmail(email)) {
             throw new BadRequestException("Email is already registered");
         }
 
         User user = User.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .email(request.getEmail().toLowerCase())
+                .firstName(request.getFirstName().trim())
+                .lastName(request.getLastName().trim())
+                .email(email)
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .phone(request.getPhone())
                 .role(User.Role.CUSTOMER)
@@ -57,9 +60,8 @@ public class AuthService {
         cartRepository.save(cart);
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+                new UsernamePasswordAuthenticationToken(email, request.getPassword())
         );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = tokenProvider.generateToken(authentication);
 
         return AuthResponse.builder()
@@ -70,15 +72,15 @@ public class AuthService {
 
     @Transactional
     public AuthResponse login(LoginRequest request) {
+        String email = normalizeEmail(request.getEmail());
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+                new UsernamePasswordAuthenticationToken(email, request.getPassword())
         );
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = tokenProvider.generateToken(authentication);
 
-        User user = userRepository.findByEmail(request.getEmail())
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
         user.setLastLoginAt(LocalDateTime.now());
         userRepository.save(user);
 
@@ -94,6 +96,27 @@ public class AuthService {
         return mapToUserDTO(user);
     }
 
+    @Transactional
+    public UserDTO updateProfile(Long userId, UpdateProfileRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        user.setFirstName(request.getFirstName().trim());
+        user.setLastName(request.getLastName().trim());
+        user.setPhone(request.getPhone());
+        return mapToUserDTO(userRepository.save(user));
+    }
+
+    @Transactional
+    public void changePassword(Long userId, ChangePasswordRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPasswordHash())) {
+            throw new BadRequestException("Current password is incorrect");
+        }
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
+
     public UserDTO mapToUserDTO(User user) {
         return UserDTO.builder()
                 .id(user.getId())
@@ -105,5 +128,9 @@ public class AuthService {
                 .active(user.getActive())
                 .createdAt(user.getCreatedAt())
                 .build();
+    }
+
+    private String normalizeEmail(String email) {
+        return email == null ? null : email.trim().toLowerCase(Locale.ROOT);
     }
 }

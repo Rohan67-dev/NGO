@@ -21,10 +21,18 @@ public class AdminOrderController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<OrderDTO>>> getAllOrders(
+            @RequestParam(required = false) String orderStatus,
+            @RequestParam(required = false) String paymentStatus,
+            @RequestParam(required = false) String query,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "15") int size) {
-        Page<OrderDTO> orders = orderService.getAllOrdersAdmin(page, size);
+        Page<OrderDTO> orders = orderService.searchOrdersAdmin(orderStatus, paymentStatus, query, page, size);
         return ResponseEntity.ok(ApiResponse.success(orders));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<OrderDTO>> getOrder(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.success(orderService.getOrderAdmin(id)));
     }
 
     @PutMapping("/{id}/status")

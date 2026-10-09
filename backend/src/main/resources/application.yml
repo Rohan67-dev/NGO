@@ -1,23 +1,30 @@
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
   servlet:
     context-path: /
+  error:
+    include-message: never
+    include-stacktrace: never
 
 spring:
   application:
     name: impact-ecommerce
   datasource:
-    url: ${DATABASE_URL:jdbc:h2:mem:ngodb;DB_CLOSE_DELAY=-1}
+    # Default: file-based H2 under backend/data so local data survives restarts.
+    # Set DATABASE_URL (+ DATABASE_DRIVER / HIBERNATE_DIALECT) to use PostgreSQL.
+    url: ${DATABASE_URL:jdbc:h2:file:./data/ngodb;AUTO_SERVER=TRUE}
     username: ${DATABASE_USERNAME:sa}
     password: ${DATABASE_PASSWORD:}
     driver-class-name: ${DATABASE_DRIVER:org.h2.Driver}
   h2:
     console:
-      enabled: true
+      enabled: ${H2_CONSOLE_ENABLED:false}
       path: /h2-console
       settings:
-        web-allow-others: true
+        web-allow-others: false
   jpa:
+    # Services map lazy associations (category, user) to DTOs outside explicit transactions; keep OSIV on.
+    open-in-view: true
     hibernate:
       ddl-auto: update
     show-sql: false
@@ -25,24 +32,40 @@ spring:
       hibernate:
         format_sql: true
         dialect: ${HIBERNATE_DIALECT:org.hibernate.dialect.H2Dialect}
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
 
 app:
   jwt:
+    # Development default only. Always set JWT_SECRET (>= 32 bytes) outside local development.
     secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
     expiration-ms: ${JWT_EXPIRATION_MS:86400000} # 24 hours
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000}
   razorpay:
+    # Leave the placeholders to run without online payments: checkout will report that
+    # payments are not configured instead of pretending a payment succeeded.
     key-id: ${RAZORPAY_KEY_ID:rzp_test_placeholder_key}
     key-secret: ${RAZORPAY_KEY_SECRET:rzp_test_placeholder_secret}
     webhook-secret: ${RAZORPAY_WEBHOOK_SECRET:rzp_webhook_secret_placeholder}
+  seed:
+    # Seeds clearly-labelled DEMO categories/products/content and demo accounts into an empty database.
+    demo-data: ${APP_SEED_DEMO_DATA:true}
+  order:
+    free-shipping-threshold: ${ORDER_FREE_SHIPPING_THRESHOLD:999}
+    shipping-fee: ${ORDER_SHIPPING_FEE:99}
+    tax-rate: ${ORDER_TAX_RATE:0.05}
   ngo:
-    name: "Aasha Foundation for Social Impact"
-    email: "contact@aasha-impact.org"
-    phone: "+91 98765 43210"
+    # Placeholder contact details from the original generator - replace with the NGO's real details.
+    name: ${NGO_NAME:Aasha Foundation for Social Impact}
+    email: ${NGO_EMAIL:contact@aasha-impact.org}
+    phone: ${NGO_PHONE:+91 98765 43210}
+    address: ${NGO_ADDRESS:Aasha Foundation Center, Sector 4, New Delhi - 110001}
 
 logging:
   level:
     root: INFO
-    com.ngo.impact: DEBUG
+    com.ngo.impact: INFO
     org.hibernate.SQL: WARN

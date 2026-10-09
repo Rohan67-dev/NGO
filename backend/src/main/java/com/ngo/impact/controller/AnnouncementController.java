@@ -1,11 +1,13 @@
 package com.ngo.impact.controller;
 
+import com.ngo.impact.dto.AnnouncementDTO;
 import com.ngo.impact.dto.ApiResponse;
-import com.ngo.impact.entity.Announcement;
 import com.ngo.impact.service.ImpactService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -17,8 +19,7 @@ public class AnnouncementController {
     private final ImpactService impactService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Announcement>>> getAnnouncements() {
-        List<Announcement> list = impactService.getActiveAnnouncements();
-        return ResponseEntity.ok(ApiResponse.success(list));
+    public ResponseEntity<ApiResponse<List<AnnouncementDTO>>> getAnnouncements() {
+        return ResponseEntity.ok(ApiResponse.success(impactService.getActiveAnnouncements()));
     }
 }

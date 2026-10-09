@@ -61,6 +61,24 @@ public class Product {
 
     private BigDecimal impactAmount; // Optional financial impact contribution metric
 
+    // Catalogue / compliance details (e.g. from the NGO's product catalogue spreadsheet). All optional.
+    private String sourceSerialNo;   // Serial number / identifier in the source catalogue
+    private String brand;
+    private String manufacturer;
+    private String hsnCode;
+
+    @Column(precision = 5, scale = 2)
+    private BigDecimal gstRate;      // GST percentage recorded in the catalogue, e.g. 5.00 or 12.00
+
+    private String material;
+    private String dimensions;       // Size / dimensions as written in the catalogue
+    private String colour;
+    private String listingStatus;    // Marketplace listing / upload status from the catalogue
+
+    // Any additional catalogue columns that have no dedicated field, kept verbatim as a JSON object
+    @Column(columnDefinition = "TEXT")
+    private String extraAttributes;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default

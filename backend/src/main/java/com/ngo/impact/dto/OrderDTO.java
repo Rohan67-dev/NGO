@@ -19,6 +19,7 @@ public class OrderDTO {
     private Long userId;
     private String customerName;
     private String customerEmail;
+    private String customerPhone;
     private BigDecimal subtotal;
     private BigDecimal discountAmount;
     private BigDecimal shippingAmount;
@@ -31,5 +32,8 @@ public class OrderDTO {
     private String shippingCarrier;
     private List<OrderItemDTO> items;
     private String razorpayOrderId;
+    /** Status transitions an administrator may apply next. */
+    private List<String> allowedNextStatuses;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

@@ -18,4 +18,10 @@ public class CartDTO {
     private List<CartItemDTO> items;
     private BigDecimal subtotal;
     private Integer totalItems;
+    private BigDecimal shippingAmount;
+    private BigDecimal taxAmount;
+    private BigDecimal taxRatePercent;
+    private BigDecimal totalAmount;
+    private BigDecimal freeShippingThreshold;
+    private Boolean hasUnavailableItems;
 }

@@ -17,6 +17,7 @@ public class PaymentInitResponse {
     private Long orderId;
     private String orderNumber;
     private BigDecimal amount;
+    private Long amountInPaise;
     private String currency;
     private String customerName;
     private String customerEmail;

@@ -26,6 +26,8 @@ public class WishlistService {
 
     public List<ProductDTO> getUserWishlist(Long userId) {
         return wishlistRepository.findByUserId(userId).stream()
+                // Archived products disappear from the wishlist instead of linking to a missing page
+                .filter(wish -> wish.getProduct().getStatus() != Product.Status.INACTIVE)
                 .map(wish -> productService.mapToDTO(wish.getProduct()))
                 .collect(Collectors.toList());
     }

@@ -1,6 +1,8 @@
 package com.ngo.impact.controller;
 
 import com.ngo.impact.dto.ApiResponse;
+import com.ngo.impact.dto.ChangePasswordRequest;
+import com.ngo.impact.dto.UpdateProfileRequest;
 import com.ngo.impact.dto.AuthResponse;
 import com.ngo.impact.dto.LoginRequest;
 import com.ngo.impact.dto.RegisterRequest;
@@ -39,5 +41,21 @@ public class AuthController {
         }
         UserDTO user = authService.getUserProfile(userPrincipal.getId());
         return ResponseEntity.ok(ApiResponse.success(user));
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<ApiResponse<UserDTO>> updateProfile(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @Valid @RequestBody UpdateProfileRequest request) {
+        UserDTO user = authService.updateProfile(userPrincipal.getId(), request);
+        return ResponseEntity.ok(ApiResponse.success("Profile updated", user));
+    }
+
+    @PutMapping("/me/password")
+    public ResponseEntity<ApiResponse<Void>> changePassword(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @Valid @RequestBody ChangePasswordRequest request) {
+        authService.changePassword(userPrincipal.getId(), request);
+        return ResponseEntity.ok(ApiResponse.success("Password changed", null));
     }
 }

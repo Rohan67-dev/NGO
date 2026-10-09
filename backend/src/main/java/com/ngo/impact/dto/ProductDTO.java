@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @Builder
@@ -31,5 +32,16 @@ public class ProductDTO {
     private String status;
     private Boolean featured;
     private List<String> imageUrls;
+    private String sourceSerialNo;
+    private String brand;
+    private String manufacturer;
+    private String hsnCode;
+    private BigDecimal gstRate;
+    private String material;
+    private String dimensions;
+    private String colour;
+    private String listingStatus;
+    /** Additional source-catalogue columns preserved verbatim. */
+    private Map<String, String> extraAttributes;
     private LocalDateTime createdAt;
 }
