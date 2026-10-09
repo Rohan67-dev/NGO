@@ -1,5 +1,6 @@
 import React from 'react';
-import { ShieldCheck, Heart, Users, Target, Award } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ShieldCheck, Heart, Target, Award } from 'lucide-react';
 
 export const About: React.FC = () => {
   return (
@@ -39,9 +40,10 @@ export const About: React.FC = () => {
           <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center">
             <Award className="w-5 h-5" />
           </div>
-          <h3 className="text-base font-bold text-slate-900">100% Financial Transparency</h3>
+          <h3 className="text-base font-bold text-slate-900">Transparency</h3>
           <p className="text-xs text-slate-500 leading-relaxed">
-            All generated revenues after direct artisan wages and material costs fund our registered social welfare programs and beneficiary healthcare.
+            The impact figures, field projects and campaigns the NGO publishes are listed in the{" "}
+            <Link to="/impact" className="text-emerald-700 underline">Impact Portal</Link>.
           </p>
         </div>
       </div>

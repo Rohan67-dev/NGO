@@ -15,6 +15,7 @@ export const ImpactStories: React.FC = () => {
   });
 
   const stories = data?.content || [];
+  const empty = data && stories.length === 0;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -24,6 +25,7 @@ export const ImpactStories: React.FC = () => {
         <p className="text-xs text-slate-500">Real interviews and narratives from the rural artisans and communities we serve.</p>
       </div>
 
+      {empty && <p className="text-center text-xs text-slate-500">No stories have been published yet.</p>}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {stories.map((story) => (
           <Link key={story.id} to={`/stories/${story.slug}`} className="group bg-white rounded-3xl border border-slate-200/80 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col">

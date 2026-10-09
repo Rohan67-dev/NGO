@@ -4,9 +4,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AppRoutes } from './routes/AppRoutes';
 import { useAuthStore } from './store/useAuthStore';
 import { useCartStore } from './store/useCartStore';
+import { useWishlistStore } from './store/useWishlistStore';
 import { axiosClient } from './api/axiosClient';
+import { Toaster } from './components/common/Toaster';
 
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
@@ -16,37 +18,27 @@ const queryClient = new QueryClient({
 });
 
 export const App: React.FC = () => {
-  const { isAuthenticated, setAuth } = useAuthStore();
+  const { isAuthenticated, setUser } = useAuthStore();
   const { setCart } = useCartStore();
+  const { setWishlist } = useWishlistStore();
 
   useEffect(() => {
-    // Verify token on mount if present
-    if (isAuthenticated) {
-      axiosClient.get('/auth/me')
-        .then((res) => {
-          if (res.data.success) {
-            const token = localStorage.getItem('ngo_auth_token') || '';
-            setAuth(res.data.data, token);
-          }
-        })
-        .catch(() => {
-          // Keep current stored state unless explicitly invalid
-        });
-
-      axiosClient.get('/cart')
-        .then((res) => {
-          if (res.data.success) {
-            setCart(res.data.data);
-          }
-        })
-        .catch(() => {});
+    if (!isAuthenticated) {
+      // Drop any cached private data (orders, admin lists) from the previous session.
+      queryClient.clear();
+      return;
     }
+    // Refresh the stored profile; a 401 here logs the user out via the axios interceptor.
+    axiosClient.get('/auth/me').then((res) => setUser(res.data.data)).catch(() => {});
+    axiosClient.get('/cart').then((res) => setCart(res.data.data)).catch(() => {});
+    axiosClient.get('/wishlist').then((res) => setWishlist(res.data.data)).catch(() => {});
   }, [isAuthenticated]);
 
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AppRoutes />
+        <Toaster />
       </BrowserRouter>
     </QueryClientProvider>
   );

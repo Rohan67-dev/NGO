@@ -5,6 +5,7 @@ import { ArrowLeft, Calendar, User as UserIcon } from 'lucide-react';
 import { axiosClient } from '@/api/axiosClient';
 import { ImpactStory } from '@/types';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { PLACEHOLDER_IMAGE } from '@/lib/format';
 
 export const StoryDetails: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -17,10 +18,18 @@ export const StoryDetails: React.FC = () => {
       return res.data.data;
     },
     enabled: !!slug,
+    retry: false,
   });
 
   if (isLoading) return <LoadingSpinner size="lg" />;
-  if (!story) return null;
+  if (!story) {
+    return (
+      <div className="text-center py-16 space-y-3">
+        <h1 className="text-lg font-bold text-slate-800">Story not found</h1>
+        <button onClick={() => navigate('/stories')} className="text-xs font-semibold text-emerald-600 underline">See all stories</button>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -43,7 +52,7 @@ export const StoryDetails: React.FC = () => {
         </div>
 
         <div className="aspect-video bg-slate-100 rounded-2xl overflow-hidden">
-          <img src={story.imageUrl || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=800'} alt="" className="w-full h-full object-cover" />
+          <img src={story.imageUrl || PLACEHOLDER_IMAGE} alt={story.title} className="w-full h-full object-cover" />
         </div>
 
         <div className="text-sm text-slate-700 leading-relaxed space-y-4 pt-4 whitespace-pre-line">

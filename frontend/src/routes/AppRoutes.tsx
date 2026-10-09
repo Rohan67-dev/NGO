@@ -8,10 +8,12 @@ import { Shop } from '../components/pages/public/Shop';
 import { ProductDetails } from '../components/pages/public/ProductDetails';
 import { ImpactHub } from '../components/pages/public/ImpactHub';
 import { Campaigns } from '../components/pages/public/Campaigns';
+import { CampaignDetails } from '../components/pages/public/CampaignDetails';
 import { ImpactStories } from '../components/pages/public/ImpactStories';
 import { StoryDetails } from '../components/pages/public/StoryDetails';
 import { Contact } from '../components/pages/public/Contact';
 import { Policies } from '../components/pages/public/Policies';
+import { NotFound } from '../components/pages/public/NotFound';
 
 import { Login } from '../components/pages/customer/Login';
 import { Register } from '../components/pages/customer/Register';
@@ -26,6 +28,8 @@ import { AdminOrders } from '../components/pages/admin/AdminOrders';
 import { AdminCampaigns } from '../components/pages/admin/AdminCampaigns';
 import { AdminImpact } from '../components/pages/admin/AdminImpact';
 import { AdminStories } from '../components/pages/admin/AdminStories';
+import { AdminAnnouncements } from '../components/pages/admin/AdminAnnouncements';
+import { AdminMessages } from '../components/pages/admin/AdminMessages';
 
 import { ProtectedRoute, AdminRoute } from './ProtectedRoute';
 
@@ -40,6 +44,7 @@ export const AppRoutes: React.FC = () => {
         <Route path="/product/:slug" element={<ProductDetails />} />
         <Route path="/impact" element={<ImpactHub />} />
         <Route path="/campaigns" element={<Campaigns />} />
+        <Route path="/campaigns/:slug" element={<CampaignDetails />} />
         <Route path="/stories" element={<ImpactStories />} />
         <Route path="/stories/:slug" element={<StoryDetails />} />
         <Route path="/contact" element={<Contact />} />
@@ -53,9 +58,11 @@ export const AppRoutes: React.FC = () => {
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
         <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+
+        <Route path="*" element={<NotFound />} />
       </Route>
 
-      {/* Admin Layout & Protected Routes */}
+      {/* Admin Layout & Protected Routes (the server enforces roles on every admin API as well) */}
       <Route element={<AdminRoute><AdminLayout /></AdminRoute>}>
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/products" element={<AdminProducts />} />
@@ -64,6 +71,8 @@ export const AppRoutes: React.FC = () => {
         <Route path="/admin/campaigns" element={<AdminCampaigns />} />
         <Route path="/admin/impact" element={<AdminImpact />} />
         <Route path="/admin/stories" element={<AdminStories />} />
+        <Route path="/admin/announcements" element={<AdminAnnouncements />} />
+        <Route path="/admin/messages" element={<AdminMessages />} />
       </Route>
     </Routes>
   );

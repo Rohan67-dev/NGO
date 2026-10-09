@@ -1,23 +1,27 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Send, CheckCircle2 } from 'lucide-react';
-import { axiosClient } from '@/api/axiosClient';
+import { axiosClient, getErrorMessage } from '@/api/axiosClient';
+import { useSiteInfo } from '@/hooks/useSiteInfo';
 
 export const Contact: React.FC = () => {
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', subject: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const { data: site } = useSiteInfo();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMsg('');
     try {
       const res = await axiosClient.post('/contact', formData);
       if (res.data.success) {
         setSubmitted(true);
         setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
       }
-    } catch (e) {
-      console.error(e);
+    } catch (err) {
+      setErrorMsg(getErrorMessage(err, 'Your message could not be sent. Please try again.'));
     } finally {
       setLoading(false);
     }
@@ -37,15 +41,15 @@ export const Contact: React.FC = () => {
           <div className="space-y-4 text-xs text-slate-300">
             <div className="flex items-start gap-3">
               <MapPin className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
-              <span>Aasha Foundation Center, Sector 4, New Delhi - 110001, India</span>
+              <span>{site?.address}</span>
             </div>
             <div className="flex items-center gap-3">
               <Mail className="w-5 h-5 text-emerald-400 shrink-0" />
-              <span>contact@aasha-impact.org</span>
+              <a href={`mailto:${site?.email}`} className="hover:text-white">{site?.email}</a>
             </div>
             <div className="flex items-center gap-3">
               <Phone className="w-5 h-5 text-emerald-400 shrink-0" />
-              <span>+91 98765 43210</span>
+              <span>{site?.phone}</span>
             </div>
           </div>
         </div>
@@ -60,6 +64,9 @@ export const Contact: React.FC = () => {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
+              {errorMsg && (
+                <div className="bg-red-50 text-red-700 text-xs p-3 rounded-xl border border-red-200 font-medium" role="alert">{errorMsg}</div>
+              )}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">Your Name</label>
@@ -85,7 +92,7 @@ export const Contact: React.FC = () => {
                 <textarea required rows={4} value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} className="w-full text-xs p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-emerald-500" />
               </div>
               <button disabled={loading} type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-6 py-3 rounded-xl shadow-md transition-all flex items-center gap-2">
-                <Send className="w-4 h-4" /> Send Message
+                <Send className="w-4 h-4" aria-hidden="true" /> {loading ? 'Sending…' : 'Send Message'}
               </button>
             </form>
           )}

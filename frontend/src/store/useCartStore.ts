@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Cart, CartItem } from '../types';
+import { Cart } from '../types';
 
 interface CartState {
   cart: Cart | null;
@@ -11,6 +11,7 @@ interface CartState {
   clearLocalCart: () => void;
 }
 
+/** Mirror of the server-side cart (the backend is the source of truth; this is never persisted locally). */
 export const useCartStore = create<CartState>((set) => ({
   cart: null,
   isOpen: false,
@@ -18,5 +19,5 @@ export const useCartStore = create<CartState>((set) => ({
   openCart: () => set({ isOpen: true }),
   closeCart: () => set({ isOpen: false }),
   toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
-  clearLocalCart: () => set({ cart: null }),
+  clearLocalCart: () => set({ cart: null, isOpen: false }),
 }));

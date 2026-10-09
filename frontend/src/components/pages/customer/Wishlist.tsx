@@ -1,60 +1,49 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Heart } from 'lucide-react';
 import { axiosClient } from '../../../api/axiosClient';
 import { Product } from '../../../types';
 import { ProductGrid } from '../../shop/ProductGrid';
-import { useCartStore } from '../../../store/useCartStore';
+import { useWishlistStore } from '../../../store/useWishlistStore';
+import { useShopActions } from '../../../hooks/useShopActions';
 
 export const Wishlist: React.FC = () => {
-  const { setCart, openCart } = useCartStore();
+  const { items, setWishlist } = useWishlistStore();
+  const { addToCart, toggleWishlist, pendingId } = useShopActions();
 
-  const { data: products, isLoading, refetch } = useQuery<Product[]>({
+  // Refresh from the server on visit; the shared store keeps hearts/counts in sync everywhere else.
+  const { data, isLoading, isError, refetch } = useQuery<Product[]>({
     queryKey: ['wishlist-items'],
-    queryFn: async () => {
-      const res = await axiosClient.get('/wishlist');
-      return res.data.data;
-    },
+    queryFn: async () => (await axiosClient.get('/wishlist')).data.data,
   });
-
-  const handleAddToCart = async (product: Product) => {
-    try {
-      const res = await axiosClient.post('/cart/items', { productId: product.id, quantity: 1 });
-      if (res.data.success) {
-        setCart(res.data.data);
-        openCart();
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const handleRemoveWishlist = async (productId: number) => {
-    try {
-      await axiosClient.delete(`/wishlist/${productId}`);
-      refetch();
-    } catch (e) {
-      console.error(e);
-    }
-  };
+  useEffect(() => {
+    if (data) setWishlist(data);
+  }, [data, setWishlist]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm flex items-center gap-3">
         <div className="w-10 h-10 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center">
-          <Heart className="w-5 h-5 fill-rose-600" />
+          <Heart className="w-5 h-5 fill-rose-600" aria-hidden="true" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-slate-900">Your Saved Wishlist</h1>
-          <p className="text-xs text-slate-500">Handcrafted products saved for your next impact purchase.</p>
+          <h1 className="text-xl font-bold text-slate-900">Your Saved Wishlist ({items.length})</h1>
+          <p className="text-xs text-slate-500">Products saved for later. Out-of-stock items stay here until you remove them.</p>
         </div>
       </div>
 
       <ProductGrid
-        products={products || []}
-        isLoading={isLoading}
-        onAddToCart={handleAddToCart}
-        onToggleWishlist={handleRemoveWishlist}
+        products={items}
+        isLoading={isLoading && items.length === 0}
+        isError={isError}
+        onRetry={() => refetch()}
+        onAddToCart={(p) => addToCart(p)}
+        onToggleWishlist={toggleWishlist}
+        busyProductId={pendingId}
+        emptyTitle="Your wishlist is empty"
+        emptyMessage="Tap the heart on any product to save it here."
+        emptyAction={<Link to="/shop" className="btn-primary px-4 py-2 inline-block">Browse products</Link>}
       />
     </div>
   );
