@@ -1,117 +1,99 @@
 # AASHA Foundation — NGO Impact-Driven E-Commerce Platform
 
-A production-quality **NGO Impact-Driven E-Commerce Platform** combining commercial e-commerce, verified social impact storytelling, campaign transparency, real-time inventory management, Razorpay payments, role-based access control (RBAC), and enterprise Admin Operations Dashboard.
+An e-commerce storefront for an NGO's artisan products, combined with impact storytelling (metrics, field projects, campaigns, stories), Razorpay payments, role-based access control and an admin operations dashboard.
 
----
+> **Status:** repaired and stabilised — see [`docs/REPAIR_AUDIT.md`](docs/REPAIR_AUDIT.md), [`docs/FEATURE_PARITY_MATRIX.md`](docs/FEATURE_PARITY_MATRIX.md) and [`docs/REPAIR_PROGRESS.md`](docs/REPAIR_PROGRESS.md).
+> The bundled products, figures and story are **demo data** (labelled as such on the site). Load the NGO's real catalogue with **Admin → Products → Import CSV**.
 
-## 🌟 Core Concept: DISCOVER → SHOP → SUPPORT → SEE THE IMPACT
+## DISCOVER → SHOP → SUPPORT → SEE THE IMPACT
 
-Every product purchased on the platform directly funds fair wages for rural artisans, smallholder farmers, and registered NGO social welfare initiatives.
+## Technology Stack
 
----
+**Frontend** — React 18 + Vite 5 + TypeScript (strict), Tailwind CSS, lucide-react, TanStack Query v5 (server state), Zustand (session/cart/wishlist mirrors), React Router v6, Axios. Tests: Vitest + Testing Library.
 
-## 🛠️ Technology Stack
+**Backend** — Java 17, Spring Boot 3.2.4, Spring Security (stateless JWT, BCrypt, roles `CUSTOMER`, `ADMIN`, `SUPER_ADMIN`, `STAFF`), Spring Data JPA / Hibernate, Bean Validation, Razorpay Java SDK. Database: file-based H2 by default, PostgreSQL via environment variables. Tests: Spring Boot MockMvc integration tests on in-memory H2.
 
-### Frontend
-- **Framework**: React 18 + Vite + TypeScript
-- **Styling**: Tailwind CSS + Custom Design Tokens (Emerald & Amber Palette)
-- **Icons**: Lucide React Icons
-- **State Management**: TanStack Query v5 (Server State) + Zustand (Client Auth, Cart & Wishlist State)
-- **Routing**: React Router v6
-- **HTTP Client**: Axios with JWT Bearer Token Interceptor
-
-### Backend
-- **Framework**: Java 17 + Spring Boot 3.2.4
-- **Security**: Spring Security + Stateless JWT + BCrypt Password Hashing + Role-Based Access Control (`CUSTOMER`, `ADMIN`, `SUPER_ADMIN`, `STAFF`)
-- **Persistence**: Spring Data JPA + Hibernate
-- **Database**: PostgreSQL (with automated fallback H2 database profile for zero-config local testing)
-- **Payments**: Razorpay Java SDK + HMAC-SHA256 Server Signature Verification
-- **Validation**: Bean Validation (Jakarta) + Global `@ControllerAdvice` Exception Handler
-
----
-
-## 📦 Project Directory Structure
+## Project Structure
 
 ```
 ngo-project/
-├── frontend/                 # React 18 + Vite + TypeScript Frontend
-│   ├── src/
-│   │   ├── api/              # Axios HTTP client & interceptors
-│   │   ├── components/       # Common, Shop, Cart, Impact, Checkout, Admin components
-│   │   ├── layouts/          # MainLayout (Storefront) & AdminLayout (Sidebar operations)
-│   │   ├── pages/            # Public, Customer, and Admin pages
-│   │   ├── routes/           # AppRoutes, ProtectedRoute & AdminRoute guards
-│   │   ├── store/            # Zustand stores (Cart, Auth, Wishlist)
-│   │   └── types/            # TypeScript interfaces
-│   ├── package.json
-│   ├── vite.config.ts
-│   └── tailwind.config.js
-├── backend/                  # Java 17 Spring Boot REST API Backend
-│   ├── src/main/java/com/ngo/impact/
-│   │   ├── config/           # SecurityConfig, DataInitializer (Seed Data)
-│   │   ├── controller/       # Auth, Product, Category, Cart, Order, Payment, Admin controllers
-│   │   ├── dto/              # Request/Response DTOs
-│   │   ├── entity/           # JPA Entities (User, Product, Order, Payment, Campaign, ImpactMetric, Story)
-│   │   ├── exception/        # GlobalExceptionHandler & custom exceptions
-│   │   ├── repository/       # Spring Data JPA Repositories
-│   │   ├── security/         # JwtTokenProvider, JwtAuthenticationFilter, UserPrincipal
-│   │   └── service/          # Business logic services (OrderService, PaymentService, Inventory)
-│   ├── src/main/resources/
-│   │   └── application.yml
-│   └── pom.xml
-├── .env.example              # Documented environment configuration
-└── README.md                 # Technical documentation
+├── frontend/
+│   └── src/
+│       ├── api/            # Axios client, error helpers, 401 handling
+│       ├── components/     # common, shop, cart, layouts, pages/{public,customer,admin}
+│       ├── hooks/          # useShopActions (cart/wishlist), useSiteInfo
+│       ├── lib/            # formatting helpers, Razorpay checkout helper
+│       ├── routes/         # AppRoutes, ProtectedRoute, AdminRoute
+│       ├── store/          # Zustand stores (auth, cart, wishlist, toasts)
+│       └── types/
+├── backend/
+│   └── src/
+│       ├── main/java/com/ngo/impact/
+│       │   ├── config/      # DataInitializer (demo seed, admin bootstrap)
+│       │   ├── controller/  # public, customer and admin REST controllers
+│       │   ├── dto/  entity/  exception/  repository/  security/
+│       │   ├── payment/     # PaymentGateway + RazorpayGateway
+│       │   └── service/     # business logic incl. CatalogueImportService
+│       └── test/java/...    # integration tests
+├── scripts/e2e-smoke.mjs    # live API journey through the dev proxy
+├── docs/                    # audit, feature matrix, progress log
+└── .env.example
 ```
 
----
+## Running Locally
 
-## 🔑 Pre-Seeded Demo Credentials
+Prerequisites: Java 17, Node 18+ (tested with Node 24), Maven 3.9+ (or the wrapper, see note).
 
-The platform automatically seeds realistic demo categories, products, active campaigns, impact metrics, beneficiary stories, and user accounts on startup:
+### 1. Backend (port 8080)
+```bash
+cd backend
+mvn spring-boot:run          # or: mvnw.cmd spring-boot:run  (Windows)
+```
+Data is stored in `backend/data/` (H2 file) and survives restarts. On an empty database the demo seed creates labelled sample content and two demo accounts:
 
-| Account Role | Email Address | Password | Privileges |
-| :--- | :--- | :--- | :--- |
-| **Customer** | `customer@ngo.org` | `customer123` | Shop catalog, Cart, Wishlist, Checkout, Track Orders |
-| **Admin** | `admin@ngo.org` | `admin123` | Full Enterprise Admin Operations, Inventory, Order Status updates, CMS |
+| Role | Email | Password |
+|---|---|---|
+| Customer | `customer@ngo.org` | `customer123` |
+| Admin | `admin@ngo.org` | `admin123` |
 
----
+For a real deployment set `APP_SEED_DEMO_DATA=false`, `APP_ADMIN_EMAIL` / `APP_ADMIN_PASSWORD`, and a strong `JWT_SECRET` (see `.env.example`).
 
-## 🚀 Commands to Run the Application
+> **Maven wrapper note:** if `mvnw.cmd` fails, delete `%USERPROFILE%\.m2\wrapper\dists\apache-maven-3.9.6-bin` (an incomplete earlier download) so the wrapper downloads Maven again, or use an installed `mvn`.
 
-### 1. Frontend Setup & Run
+**PostgreSQL:** set `DATABASE_URL`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`, `DATABASE_DRIVER=org.postgresql.Driver`, `HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect`. Tables are created/updated automatically (`ddl-auto: update`).
+
+### 2. Frontend (port 5173)
 ```bash
 cd frontend
-cmd /c npm install
-cmd /c npm run dev
+npm install
+npm run dev
 ```
-The storefront will open at `http://localhost:5173`.
+The dev server proxies `/api` to `http://localhost:8080`, so no frontend environment variables are needed locally.
 
-### 2. Backend Setup & Run (Java 17)
+### 3. Payments
+Without Razorpay credentials the checkout clearly reports that online payment is not configured; it never simulates a successful payment. To enable it, set `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` (test-mode keys from the Razorpay dashboard), and for robustness configure a webhook to `https://<host>/api/payments/webhook` with `RAZORPAY_WEBHOOK_SECRET` (events `payment.captured`, `order.paid`, `payment.failed`).
+
+## Tests and Builds
 ```bash
-cd backend
-java -cp "target/classes;target/dependency/*" com.ngo.impact.ImpactEcommerceApplication
+cd backend  && mvn test             # 19 integration tests
+cd frontend && npm test             # 15 unit/component tests
+cd frontend && npm run build        # type-check + production bundle in frontend/dist
+node scripts/e2e-smoke.mjs          # with backend (fresh demo DB) + `npm run dev` running: 68 live checks
+cd backend  && mvn -DskipTests package   # runnable jar in backend/target
 ```
-or via Maven wrapper:
-```bash
-cd backend
-./mvnw spring-boot:run
-```
-The REST API will run at `http://localhost:8080`.
 
----
+## Payment Flow (Razorpay)
+1. `POST /api/orders` — server prices the cart (discounts, 5% GST, ₹99 shipping below ₹999 — configurable) and stores an unpaid order with price/name snapshots. A repeated submit for the same cart reuses that order.
+2. `POST /api/payments/initiate/{orderId}` — creates (or reuses) the Razorpay order for the exact amount.
+3. Browser opens Razorpay Checkout.
+4. `POST /api/payments/verify` — HMAC-SHA256 signature check with the key secret, ownership and order-id match. Then, under row locks and exactly once: payment → SUCCESS, order → PAID/CONFIRMED, stock decremented, purchased lines removed from the cart. If stock ran out meanwhile, the order is cancelled and flagged "refund due" instead of overselling.
+5. Recovery: the signed webhook and the customer's "Check payment status" button (`/api/payments/reconcile/{id}`) confirm payments if the browser closed.
 
-## 💳 Payment Gateway Architecture (Razorpay)
+## Catalogue Import
+Admin → Products → **Import CSV** (UTF-8). Required column: `SKU`. Recognised headers include Sr. No., Brand, Manufacturer, Product Title, HSN Code, GST, Selling Price, Discount Price, Description, Size, Material, Colour, Image (URLs separated by `|`), Upload/Listing Status, Category, Stock. Rows are matched on SKU; blank cells never overwrite stored values; unknown columns are preserved as extra product details; use **Dry run** to validate first. **Export CSV** downloads the current catalogue.
 
-1. **Order Creation**: Server locks historical item prices and creates pending Order record.
-2. **Razorpay Initiation**: Backend returns `razorpay_order_id`, `key_id`, amount in paise to frontend.
-3. **Checkout Modal**: Frontend launches official Razorpay Checkout window.
-4. **Server Verification**: Frontend sends `razorpay_order_id`, `razorpay_payment_id`, and `razorpay_signature` to `/api/payments/verify`.
-5. **HMAC Check**: Server verifies signature using `RAZORPAY_KEY_SECRET`. Upon success, order status becomes `CONFIRMED`, payment becomes `PAID`, inventory stock is reduced, and cart is cleared.
-
----
-
-## 🛡️ Security & Integrity Highlights
-
-- **No Plaintext Secrets**: Passwords hashed with BCrypt.
-- **Client Price Isolation**: Product prices and order totals are computed server-side only. Client input is never trusted.
-- **RBAC**: Admin endpoints are strictly protected with `@PreAuthorize("hasRole('ADMIN')")`.
+## Security Notes
+- Passwords hashed with BCrypt; JWT secret must be overridden in production.
+- All `/api/admin/**` endpoints require a staff role on the server; customers can only access their own carts, addresses and orders.
+- Client prices are never trusted; totals are computed on the server.
+- Error responses never include stack traces or SQL; CORS is limited to `CORS_ALLOWED_ORIGINS`; the H2 console is disabled by default.

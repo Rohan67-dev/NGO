@@ -49,7 +49,7 @@ export const Navbar: React.FC = () => {
   };
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
-    `hover:text-emerald-600 transition-colors ${isActive ? 'text-emerald-700 font-semibold' : ''}`;
+    `whitespace-nowrap hover:text-emerald-600 transition-colors ${isActive ? 'text-emerald-700 font-semibold' : ''}`;
 
   return (
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-sm transition-all">
@@ -86,7 +86,7 @@ export const Navbar: React.FC = () => {
         </Link>
 
         {/* Desktop Nav Links */}
-        <div className="hidden md:flex items-center space-x-6 text-sm font-medium text-slate-700">
+        <div className="hidden md:flex items-center space-x-4 lg:space-x-6 text-sm font-medium text-slate-700">
           {NAV_LINKS.map((l) => (
             <NavLink key={l.to} to={l.to} end={l.end} className={linkClass}>
               {l.label}

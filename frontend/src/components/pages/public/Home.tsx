@@ -7,7 +7,7 @@ import { Product, ImpactMetric, Campaign, ImpactStory } from '@/types';
 import { ProductCard } from '@/components/shop/ProductCard';
 import { MetricIcon } from '@/components/common/MetricIcon';
 import { useShopActions } from '@/hooks/useShopActions';
-import { formatINR } from '@/lib/format';
+import { formatINR, PLACEHOLDER_IMAGE } from '@/lib/format';
 
 export const Home: React.FC = () => {
 
@@ -109,8 +109,9 @@ export const Home: React.FC = () => {
           <div className="relative mx-auto max-w-md lg:max-w-none">
             <div className="aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-slate-800 relative group">
               <img
-                src="https://images.unsplash.com/photo-1590736704728-f4730bb30770?auto=format&fit=crop&q=80&w=1000"
-                alt="Rural woman artisan crafting handcrafted products"
+                // Was a hard-coded stock photo (a perfume bottle) captioned as an artisan; show a real shop product instead.
+                src={featuredProducts?.[0]?.imageUrls?.[0] || PLACEHOLDER_IMAGE}
+                alt={featuredProducts?.[0]?.name || 'Handmade product from the shop'}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />

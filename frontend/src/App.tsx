@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AppRoutes } from './routes/AppRoutes';
@@ -7,6 +7,7 @@ import { useCartStore } from './store/useCartStore';
 import { useWishlistStore } from './store/useWishlistStore';
 import { axiosClient } from './api/axiosClient';
 import { Toaster } from './components/common/Toaster';
+import { ScrollToTop } from './components/common/ScrollToTop';
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,10 +23,15 @@ export const App: React.FC = () => {
   const { setCart } = useCartStore();
   const { setWishlist } = useWishlistStore();
 
+  const wasAuthenticated = useRef(isAuthenticated);
+
   useEffect(() => {
+    const loggedOut = wasAuthenticated.current && !isAuthenticated;
+    wasAuthenticated.current = isAuthenticated;
     if (!isAuthenticated) {
-      // Drop any cached private data (orders, admin lists) from the previous session.
-      queryClient.clear();
+      // On logout only: drop the previous user's cached private data (orders, admin lists).
+      // resetQueries (not clear) so queries on the current page refetch instead of being orphaned.
+      if (loggedOut) queryClient.resetQueries();
       return;
     }
     // Refresh the stored profile; a 401 here logs the user out via the axios interceptor.
@@ -37,6 +43,7 @@ export const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <ScrollToTop />
         <AppRoutes />
         <Toaster />
       </BrowserRouter>

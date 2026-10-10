@@ -97,3 +97,17 @@ describe('Shop page', () => {
     get.mockRestore();
   });
 });
+
+describe('App as a guest (regression: queries were wiped on mount)', () => {
+  it('loads public data such as the announcement banner', async () => {
+    const { App } = await import('../App');
+    useAuthStore.getState().logout();
+    const get = vi.spyOn(axiosClient, 'get').mockImplementation(async (url: string) => {
+      if (url === '/announcements') return { data: { data: [{ id: 1, title: 'Demo store', content: 'Sample data', active: true }] } };
+      return { data: { data: [] } };
+    });
+    render(<App />);
+    await waitFor(() => expect(screen.getByText('Demo store:')).toBeInTheDocument());
+    get.mockRestore();
+  });
+});
