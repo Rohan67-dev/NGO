@@ -40,7 +40,7 @@ export const Register: React.FC = () => {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         email: email.trim(),
-        phone: phone.trim() || undefined,
+        phone: phone.trim(),
         password,
       });
       setAuth(res.data.data.user, res.data.data.token);
@@ -87,8 +87,8 @@ export const Register: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="reg-phone" className="form-label">Phone Number (optional)</label>
-            <input id="reg-phone" type="tel" autoComplete="tel" maxLength={20} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 ..." className="form-input" />
+            <label htmlFor="reg-phone" className="form-label">Phone Number</label>
+            <input id="reg-phone" required type="tel" autoComplete="tel" maxLength={20} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 ..." className="form-input" />
           </div>
 
           <div>

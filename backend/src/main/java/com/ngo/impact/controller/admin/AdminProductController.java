@@ -22,7 +22,7 @@ import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequestMapping("/api/admin/products")
-@PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'STAFF')")
+@PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'STAFF', 'INVENTORY_MANAGER')")
 @RequiredArgsConstructor
 public class AdminProductController {
 

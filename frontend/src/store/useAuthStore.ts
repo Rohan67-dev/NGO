@@ -15,7 +15,7 @@ interface AuthState {
 }
 
 const isAdminRole = (user: User | null) =>
-  !!user && (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN' || user.role === 'STAFF');
+  !!user && (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN' || user.role === 'STAFF' || user.role === 'INVENTORY_MANAGER' || user.role === 'DISPATCHER');
 
 const readStoredUser = (): User | null => {
   try {

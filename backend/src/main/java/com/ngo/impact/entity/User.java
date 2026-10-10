@@ -55,6 +55,6 @@ public class User {
     private LocalDateTime lastLoginAt;
 
     public enum Role {
-        CUSTOMER, ADMIN, SUPER_ADMIN, STAFF
+        CUSTOMER, ADMIN, SUPER_ADMIN, STAFF, INVENTORY_MANAGER, DISPATCHER
     }
 }

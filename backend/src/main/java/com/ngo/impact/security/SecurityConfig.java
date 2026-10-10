@@ -82,7 +82,7 @@ public class SecurityConfig {
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/error").permitAll()
                 // Admin endpoints
-                .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN", "STAFF")
+                .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN", "STAFF", "INVENTORY_MANAGER", "DISPATCHER")
                 // Customer / Authenticated endpoints
                 .anyRequest().authenticated()
             );

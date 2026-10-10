@@ -136,14 +136,7 @@ export const Navbar: React.FC = () => {
 
           {isAuthenticated ? (
             <div className="hidden sm:flex items-center space-x-2">
-              {isAdmin && (
-                <Link
-                  to="/admin"
-                  className="inline-flex items-center text-xs font-semibold px-3 py-1.5 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors shadow-sm"
-                >
-                  Admin Panel
-                </Link>
-              )}
+
               <Link
                 to="/profile"
                 className="flex items-center gap-1.5 text-xs font-medium text-slate-700 hover:text-emerald-600 px-3 py-1.5 rounded-lg border border-slate-200 hover:border-emerald-300 transition-all"
@@ -205,9 +198,7 @@ export const Navbar: React.FC = () => {
               <>
                 <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-slate-700 py-1">My Account &amp; Orders</Link>
                 <Link to="/wishlist" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-slate-700 py-1">Wishlist</Link>
-                {isAdmin && (
-                  <Link to="/admin" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-bold text-amber-600 py-1">Admin Dashboard</Link>
-                )}
+
                 <button onClick={handleLogout} className="block text-sm font-medium text-red-600 py-1">Sign out</button>
               </>
             ) : (

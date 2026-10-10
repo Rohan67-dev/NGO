@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/categories")
-@PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'STAFF')")
+@PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'STAFF', 'INVENTORY_MANAGER')")
 @RequiredArgsConstructor
 public class AdminCategoryController {
 

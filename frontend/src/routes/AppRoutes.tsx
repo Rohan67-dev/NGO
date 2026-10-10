@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from '../components/layouts/MainLayout';
 import { AdminLayout } from '../components/layouts/AdminLayout';
 import { Home } from '../components/pages/public/Home';
@@ -33,10 +33,34 @@ import { AdminMessages } from '../components/pages/admin/AdminMessages';
 
 import { ProtectedRoute, AdminRoute } from './ProtectedRoute';
 
+const appMode = import.meta.env.MODE;
+
 export const AppRoutes: React.FC = () => {
+  if (appMode === 'admin' || appMode === 'inventory' || appMode === 'dispatcher') {
+    return (
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Navigate to="/login" replace />} />
+        
+        <Route element={<AdminRoute><AdminLayout /></AdminRoute>}>
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/products" element={<AdminProducts />} />
+          <Route path="/admin/categories" element={<AdminCategories />} />
+          <Route path="/admin/orders" element={<AdminOrders />} />
+          <Route path="/admin/campaigns" element={<AdminCampaigns />} />
+          <Route path="/admin/impact" element={<AdminImpact />} />
+          <Route path="/admin/stories" element={<AdminStories />} />
+          <Route path="/admin/announcements" element={<AdminAnnouncements />} />
+          <Route path="/admin/messages" element={<AdminMessages />} />
+        </Route>
+        
+        <Route path="*" element={<Navigate to="/admin" replace />} />
+      </Routes>
+    );
+  }
+
   return (
     <Routes>
-      {/* Public & Customer Layout */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
@@ -61,19 +85,7 @@ export const AppRoutes: React.FC = () => {
 
         <Route path="*" element={<NotFound />} />
       </Route>
-
-      {/* Admin Layout & Protected Routes (the server enforces roles on every admin API as well) */}
-      <Route element={<AdminRoute><AdminLayout /></AdminRoute>}>
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/products" element={<AdminProducts />} />
-        <Route path="/admin/categories" element={<AdminCategories />} />
-        <Route path="/admin/orders" element={<AdminOrders />} />
-        <Route path="/admin/campaigns" element={<AdminCampaigns />} />
-        <Route path="/admin/impact" element={<AdminImpact />} />
-        <Route path="/admin/stories" element={<AdminStories />} />
-        <Route path="/admin/announcements" element={<AdminAnnouncements />} />
-        <Route path="/admin/messages" element={<AdminMessages />} />
-      </Route>
+      <Route path="/admin/*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };

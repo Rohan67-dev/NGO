@@ -63,9 +63,7 @@ export const AdminLayout: React.FC = () => {
             <p className="font-bold text-slate-200">{user?.firstName} {user?.lastName}</p>
             <p className="text-[10px] text-emerald-400 uppercase font-semibold">{user?.role}</p>
           </div>
-          <Link to="/" className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors">
-            <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" /> Back to Public Storefront
-          </Link>
+
           <button onClick={handleLogout} className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-red-400">
             <LogOut className="w-3.5 h-3.5" aria-hidden="true" /> Sign out
           </button>
@@ -76,7 +74,6 @@ export const AdminLayout: React.FC = () => {
       <div className="md:hidden bg-slate-950 border-b border-slate-800 px-4 py-3 space-y-2">
         <div className="flex items-center justify-between">
           <span className="text-emerald-400 font-bold text-sm">AASHA ADMIN</span>
-          <Link to="/" className="text-xs text-slate-400">Storefront</Link>
         </div>
         <nav className="flex gap-2 overflow-x-auto pb-1" aria-label="Admin">
           {navItems.map((item) => (
