@@ -4,6 +4,7 @@ import com.ngo.impact.entity.User;
 import com.ngo.impact.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -16,8 +17,15 @@ public class RoleSeeder implements CommandLineRunner {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    // Demo staff logins use well-known passwords, so they follow the same switch as the other demo accounts.
+    @Value("${app.seed.demo-data:true}")
+    private boolean seedDemoData;
+
     @Override
     public void run(String... args) throws Exception {
+        if (!seedDemoData) {
+            return;
+        }
         if (!userRepository.existsByEmail("inventory@ngo.org")) {
             User inventory = User.builder()
                     .firstName("Inventory")
